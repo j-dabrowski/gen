@@ -10,6 +10,8 @@ import os
 #data[512,512] = [254,0,0]       # Makes the middle pixel red
 #data[512,513] = [0,0,255]       # Makes the next pixel blue
 
+#python3 gen.py --0 0.png --1 0.png
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--vs", dest="view_scale", help="view scale", metavar="VIEW SCALE")
 parser.add_argument("--0", dest="img_zero", help="image zero", metavar="IMAGE ZERO")
