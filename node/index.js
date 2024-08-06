@@ -13,9 +13,22 @@ const helia = await createHeliaNode();
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 async function createHeliaNode() {
   return await createHelia()
 }
+
+async function writeToFile(filename, data) {
+    try {
+      const filePath = path.join(__dirname, filename);
+      await fs.writeFile(filePath, data);
+      console.log(`Data successfully written to ${filename}`);
+    } catch (error) {
+      console.error('Error writing to file:', error);
+    }
+  }  
 
 async function uploadToIPFS(helia, filePath) {
     try {
@@ -53,11 +66,24 @@ app.get('/upload', async (req, res) => {
     try {
       console.log("starting image upload");
       const results = await uploadMultipleImages(directoryPath);
+      writeToFile('cids.txt', JSON.stringify(results));
       res.json(results);
     } catch (error) {
       console.error('Error:', error);
       res.status(500).json({ error: 'An error occurred during upload' });
     }
+  });
+
+// Serve the HTML file at the root endpoint
+app.get('/display', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+
+app.get('/ipfs-images', async (req, res) => {
+    const filePath = 'cids.txt';
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    const images = JSON.parse(fileContents);
+    res.json(images);
   });
   
 // Start the server
